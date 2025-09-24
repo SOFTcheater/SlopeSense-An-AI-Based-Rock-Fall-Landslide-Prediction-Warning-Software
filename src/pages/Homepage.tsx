@@ -1,29 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileUpload } from "@/components/ui/file-upload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { AlertTriangle, Mountain, Activity, Cloud, Gauge, User, LogOut } from "lucide-react";
+import { Shield, Mountain, Activity, FileText, Camera, BarChart3, User, LogOut, Leaf } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import heroImage from "@/assets/mining-hero.jpg";
 
 const Homepage = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    mineName: "",
-    riskLevel: [50],
-    monitoringParams: "",
-    alertThreshold: "",
+    elevationModel: null as File | null,
+    droneImagery: null as File | null,
+    geotechnicalData: null as File | null,
+    geotechnicalFormat: "",
+    environmentalData: null as File | null,
+    environmentalFormat: "",
   });
 
-  const handleInputClick = () => {
+  const handleFileUploadClick = () => {
     if (!isAuthenticated) {
-      toast.warning("Please login to access the monitoring system");
+      toast.warning("Please login to access the file upload system");
       navigate("/login");
     }
   };
@@ -32,27 +33,32 @@ const Homepage = () => {
     e.preventDefault();
     if (!isAuthenticated) return;
 
-    if (!formData.mineName || !formData.monitoringParams || !formData.alertThreshold) {
-      toast.error("Please fill in all fields");
+    if (!formData.elevationModel || !formData.droneImagery || !formData.geotechnicalData || !formData.environmentalData) {
+      toast.error("Please upload all required files");
       return;
     }
 
-    toast.success(`Monitoring system activated for ${formData.mineName}`, {
-      description: `Risk Level: ${formData.riskLevel[0]}% | Alert Threshold: ${formData.alertThreshold}`,
+    if (!formData.geotechnicalFormat || !formData.environmentalFormat) {
+      toast.error("Please select file formats for geotechnical and environmental data");
+      return;
+    }
+
+    toast.success("AI Analysis Started Successfully!", {
+      description: "All files uploaded and processing has begun. You will receive alerts as results become available.",
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (fieldName: string) => (file: File | null) => {
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [fieldName]: file
     }));
   };
 
-  const handleParamChange = (value: string) => {
+  const handleFormatChange = (fieldName: string) => (value: string) => {
     setFormData(prev => ({
       ...prev,
-      monitoringParams: value
+      [fieldName]: value
     }));
   };
 
@@ -67,34 +73,37 @@ const Homepage = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <AlertTriangle className="h-8 w-8 text-primary" />
+            <Shield className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">RockAlert System</h1>
-              <p className="text-sm text-muted-foreground">AI-Based Rockfall Prediction & Alert Platform</p>
+              <h1 className="text-2xl font-bold text-foreground">SafeMine AI</h1>
+              <p className="text-sm text-muted-foreground">Advanced Geological Analysis & Risk Prevention</p>
             </div>
           </div>
           
-          {isAuthenticated ? (
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-foreground">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">{user?.role}</p>
+          <div className="flex items-center space-x-4">
+            <ThemeToggle />
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-foreground">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground">{user?.role}</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
               </div>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-          ) : (
-            <div className="space-x-2">
-              <Button variant="outline" onClick={() => navigate("/login")}>
-                Login
-              </Button>
-              <Button variant="industrial" onClick={() => navigate("/signup")}>
-                Sign Up
-              </Button>
-            </div>
-          )}
+            ) : (
+              <div className="space-x-2">
+                <Button variant="outline" onClick={() => navigate("/login")}>
+                  Login
+                </Button>
+                <Button variant="industrial" onClick={() => navigate("/signup")}>
+                  Sign Up
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -112,23 +121,23 @@ const Homepage = () => {
         <div className="relative container mx-auto px-4 py-20">
           <div className="max-w-2xl">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Prevent Mining <span className="text-primary">Disasters</span>
+              Smart Mining <span className="text-primary">Safety</span>
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Advanced AI monitoring system for real-time rockfall prediction and early warning alerts in open-pit mines.
+              AI-powered geological analysis using elevation models, drone imagery, and environmental data for comprehensive risk assessment.
             </p>
             <div className="flex space-x-4">
               <div className="flex items-center space-x-2 text-success">
-                <Activity className="h-5 w-5" />
-                <span className="text-sm font-medium">Real-time Monitoring</span>
+                <Camera className="h-5 w-5" />
+                <span className="text-sm font-medium">Drone Analysis</span>
               </div>
               <div className="flex items-center space-x-2 text-warning">
                 <Mountain className="h-5 w-5" />
-                <span className="text-sm font-medium">AI Prediction</span>
+                <span className="text-sm font-medium">3D Modeling</span>
               </div>
-              <div className="flex items-center space-x-2 text-danger">
-                <AlertTriangle className="h-5 w-5" />
-                <span className="text-sm font-medium">Instant Alerts</span>
+              <div className="flex items-center space-x-2 text-primary">
+                <BarChart3 className="h-5 w-5" />
+                <span className="text-sm font-medium">Data Intelligence</span>
               </div>
             </div>
           </div>
@@ -140,81 +149,95 @@ const Homepage = () => {
         <Card className="max-w-4xl mx-auto border-border">
           <CardHeader>
             <CardTitle className="text-center text-2xl text-foreground flex items-center justify-center space-x-2">
-              <Gauge className="h-6 w-6 text-primary" />
-              <span>Rockfall Monitoring Configuration</span>
+              <FileText className="h-6 w-6 text-primary" />
+              <span>AI Analysis Data Upload</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Mine Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="mineName" className="text-foreground">Mine Name</Label>
-                  <Input
-                    id="mineName"
-                    name="mineName"
-                    value={formData.mineName}
-                    onChange={handleChange}
-                    onClick={handleInputClick}
-                    placeholder={isAuthenticated ? "Enter mine site name" : "Login to configure"}
+                {/* Digital Elevation Model */}
+                <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
+                  <FileUpload
+                    accept=".dwg,.dxf,.step,.iges,.sat"
+                    label="Digital Elevation Model"
+                    description="Upload CAD file containing 3D terrain data"
+                    onFileSelect={handleFileSelect('elevationModel')}
+                    selectedFile={formData.elevationModel}
                     disabled={!isAuthenticated}
-                    className={!isAuthenticated ? "cursor-pointer" : ""}
                   />
                 </div>
 
-                {/* Alert Threshold */}
-                <div className="space-y-2">
-                  <Label htmlFor="alertThreshold" className="text-foreground">Alert Threshold</Label>
-                  <Input
-                    id="alertThreshold"
-                    name="alertThreshold"
-                    value={formData.alertThreshold}
-                    onChange={handleChange}
-                    onClick={handleInputClick}
-                    placeholder={isAuthenticated ? "Enter threshold value" : "Login to configure"}
+                {/* Drone Imagery */}
+                <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
+                  <FileUpload
+                    accept=".png,.jpg,.jpeg,.tiff"
+                    label="Drone Captured Imagery"
+                    description="High-resolution aerial photographs of mining site"
+                    onFileSelect={handleFileSelect('droneImagery')}
+                    selectedFile={formData.droneImagery}
                     disabled={!isAuthenticated}
-                    className={!isAuthenticated ? "cursor-pointer" : ""}
                   />
                 </div>
               </div>
 
-              {/* Risk Level Slider */}
-              <div className="space-y-4">
-                <Label className="text-foreground">Rockfall Risk Level: {formData.riskLevel[0]}%</Label>
-                <div onClick={handleInputClick} className={!isAuthenticated ? "cursor-pointer" : ""}>
-                  <Slider
-                    value={formData.riskLevel}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, riskLevel: value }))}
-                    max={100}
-                    step={1}
-                    disabled={!isAuthenticated}
-                    className="w-full"
-                  />
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Geotechnical Data */}
+                <div className="space-y-4">
+                  <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
+                    <FileUpload
+                      accept={formData.geotechnicalFormat === 'pdf' ? '.pdf' : '.xlsx,.xls,.csv'}
+                      label="Geotechnical Data"
+                      description="Soil and rock analysis reports"
+                      onFileSelect={handleFileSelect('geotechnicalData')}
+                      selectedFile={formData.geotechnicalData}
+                      disabled={!isAuthenticated}
+                    />
+                  </div>
+                  <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
+                    <Select 
+                      onValueChange={handleFormatChange('geotechnicalFormat')} 
+                      value={formData.geotechnicalFormat} 
+                      disabled={!isAuthenticated}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={isAuthenticated ? "Select file format" : "Login to configure"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pdf">PDF Report</SelectItem>
+                        <SelectItem value="excel">Excel Spreadsheet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span className="text-success">Low Risk</span>
-                  <span className="text-warning">Medium Risk</span>
-                  <span className="text-danger">High Risk</span>
-                </div>
-              </div>
 
-              {/* Monitoring Parameters */}
-              <div className="space-y-2">
-                <Label className="text-foreground">Monitoring Parameters</Label>
-                <div onClick={handleInputClick} className={!isAuthenticated ? "cursor-pointer" : ""}>
-                  <Select onValueChange={handleParamChange} value={formData.monitoringParams} disabled={!isAuthenticated}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={isAuthenticated ? "Select monitoring parameters" : "Login to configure"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="slope-stability">Slope Stability Analysis</SelectItem>
-                      <SelectItem value="vibration-monitoring">Vibration Monitoring</SelectItem>
-                      <SelectItem value="weather-conditions">Weather Conditions</SelectItem>
-                      <SelectItem value="ground-movement">Ground Movement Detection</SelectItem>
-                      <SelectItem value="seismic-activity">Seismic Activity</SelectItem>
-                      <SelectItem value="comprehensive">Comprehensive Monitoring</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {/* Environmental Data */}
+                <div className="space-y-4">
+                  <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
+                    <FileUpload
+                      accept={formData.environmentalFormat === 'pdf' ? '.pdf' : '.xlsx,.xls,.csv'}
+                      label="Environmental Factors"
+                      description="Weather, seismic, and environmental monitoring data"
+                      onFileSelect={handleFileSelect('environmentalData')}
+                      selectedFile={formData.environmentalData}
+                      disabled={!isAuthenticated}
+                    />
+                  </div>
+                  <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
+                    <Select 
+                      onValueChange={handleFormatChange('environmentalFormat')} 
+                      value={formData.environmentalFormat} 
+                      disabled={!isAuthenticated}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={isAuthenticated ? "Select file format" : "Login to configure"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pdf">PDF Report</SelectItem>
+                        <SelectItem value="excel">Excel Spreadsheet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
@@ -227,8 +250,8 @@ const Homepage = () => {
                     size="lg"
                     className="px-12"
                   >
-                    <Activity className="h-5 w-5 mr-2" />
-                    Activate Monitoring System
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Start AI Analysis
                   </Button>
                 ) : (
                   <Button 
@@ -236,10 +259,10 @@ const Homepage = () => {
                     variant="disabled" 
                     size="lg"
                     className="px-12"
-                    onClick={handleInputClick}
+                    onClick={handleFileUploadClick}
                   >
                     <User className="h-5 w-5 mr-2" />
-                    Login to Activate System
+                    Login to Upload Files
                   </Button>
                 )}
               </div>
@@ -252,16 +275,16 @@ const Homepage = () => {
       <section className="bg-card py-16">
         <div className="container mx-auto px-4">
           <h3 className="text-3xl font-bold text-center text-foreground mb-12">
-            Advanced Mining Safety Features
+            Advanced AI Analysis Capabilities
           </h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                <Activity className="h-8 w-8 text-primary-foreground" />
+                <Camera className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Real-time Analysis</h4>
+              <h4 className="text-xl font-semibold text-foreground">Drone Image Analysis</h4>
               <p className="text-muted-foreground">
-                Continuous monitoring of geological conditions with AI-powered analysis for immediate threat detection.
+                Advanced computer vision processes aerial imagery to identify geological changes and potential risk areas.
               </p>
             </div>
             
@@ -269,19 +292,19 @@ const Homepage = () => {
               <div className="mx-auto w-16 h-16 bg-warning rounded-full flex items-center justify-center">
                 <Mountain className="h-8 w-8 text-warning-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Predictive Modeling</h4>
+              <h4 className="text-xl font-semibold text-foreground">3D Terrain Modeling</h4>
               <p className="text-muted-foreground">
-                Advanced machine learning algorithms predict potential rockfall events before they occur.
+                CAD-based elevation models combined with geological data provide precise topographical analysis.
               </p>
             </div>
             
             <div className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-danger rounded-full flex items-center justify-center">
-                <AlertTriangle className="h-8 w-8 text-danger-foreground" />
+              <div className="mx-auto w-16 h-16 bg-success rounded-full flex items-center justify-center">
+                <Leaf className="h-8 w-8 text-success-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Instant Alerts</h4>
+              <h4 className="text-xl font-semibold text-foreground">Environmental Integration</h4>
               <p className="text-muted-foreground">
-                Immediate notification system ensures rapid response to potential hazards and worker safety.
+                Weather patterns, seismic data, and environmental factors enhance prediction accuracy and safety protocols.
               </p>
             </div>
           </div>
