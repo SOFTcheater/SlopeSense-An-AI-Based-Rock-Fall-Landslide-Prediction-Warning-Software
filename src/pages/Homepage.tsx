@@ -6,7 +6,7 @@ import { FileUpload } from "@/components/ui/file-upload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { Shield, Mountain, Activity, FileText, Camera, BarChart3, User, LogOut, Leaf } from "lucide-react";
+import { Shield, FileText, BarChart3, User, LogOut, Activity, Mountain, Radio } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import heroImage from "@/assets/mining-hero.jpg";
 
@@ -15,11 +15,10 @@ const Homepage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     elevationModel: null as File | null,
-    droneImagery: null as File | null,
     geotechnicalData: null as File | null,
     geotechnicalFormat: "",
-    environmentalData: null as File | null,
-    environmentalFormat: "",
+    sensorData: null as File | null,
+    sensorDataFormat: "",
   });
 
   const handleFileUploadClick = () => {
@@ -33,19 +32,24 @@ const Homepage = () => {
     e.preventDefault();
     if (!isAuthenticated) return;
 
-    if (!formData.elevationModel || !formData.droneImagery || !formData.geotechnicalData || !formData.environmentalData) {
+    if (!formData.elevationModel || !formData.geotechnicalData || !formData.sensorData) {
       toast.error("Please upload all required files");
       return;
     }
 
-    if (!formData.geotechnicalFormat || !formData.environmentalFormat) {
-      toast.error("Please select file formats for geotechnical and environmental data");
+    if (!formData.geotechnicalFormat || !formData.sensorDataFormat) {
+      toast.error("Please select file formats for geotechnical and sensor data");
       return;
     }
 
     toast.success("AI Analysis Started Successfully!", {
       description: "All files uploaded and processing has begun. You will receive alerts as results become available.",
     });
+    
+    // Navigate to results page after a short delay
+    setTimeout(() => {
+      navigate("/results");
+    }, 2000);
   };
 
   const handleFileSelect = (fieldName: string) => (file: File | null) => {
@@ -72,7 +76,10 @@ const Homepage = () => {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div 
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity" 
+            onClick={() => navigate("/")}
+          >
             <Shield className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-2xl font-bold text-foreground">SafeMine AI</h1>
@@ -128,8 +135,8 @@ const Homepage = () => {
             </p>
             <div className="flex space-x-4">
               <div className="flex items-center space-x-2 text-success">
-                <Camera className="h-5 w-5" />
-                <span className="text-sm font-medium">Drone Analysis</span>
+                <Radio className="h-5 w-5" />
+                <span className="text-sm font-medium">Sensor Analysis</span>
               </div>
               <div className="flex items-center space-x-2 text-warning">
                 <Mountain className="h-5 w-5" />
@@ -137,7 +144,7 @@ const Homepage = () => {
               </div>
               <div className="flex items-center space-x-2 text-primary">
                 <BarChart3 className="h-5 w-5" />
-                <span className="text-sm font-medium">Data Intelligence</span>
+                <span className="text-sm font-medium">Risk Intelligence</span>
               </div>
             </div>
           </div>
@@ -155,7 +162,7 @@ const Homepage = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="mb-6">
                 {/* Digital Elevation Model */}
                 <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
                   <FileUpload
@@ -164,18 +171,6 @@ const Homepage = () => {
                     description="Upload CAD file containing 3D terrain data"
                     onFileSelect={handleFileSelect('elevationModel')}
                     selectedFile={formData.elevationModel}
-                    disabled={!isAuthenticated}
-                  />
-                </div>
-
-                {/* Drone Imagery */}
-                <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
-                  <FileUpload
-                    accept=".png,.jpg,.jpeg,.tiff"
-                    label="Drone Captured Imagery"
-                    description="High-resolution aerial photographs of mining site"
-                    onFileSelect={handleFileSelect('droneImagery')}
-                    selectedFile={formData.droneImagery}
                     disabled={!isAuthenticated}
                   />
                 </div>
@@ -211,22 +206,22 @@ const Homepage = () => {
                   </div>
                 </div>
 
-                {/* Environmental Data */}
+                {/* Sensor Data */}
                 <div className="space-y-4">
                   <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
                     <FileUpload
-                      accept={formData.environmentalFormat === 'pdf' ? '.pdf' : '.xlsx,.xls,.csv'}
-                      label="Environmental Factors"
-                      description="Weather, seismic, and environmental monitoring data"
-                      onFileSelect={handleFileSelect('environmentalData')}
-                      selectedFile={formData.environmentalData}
+                      accept={formData.sensorDataFormat === 'pdf' ? '.pdf' : '.xlsx,.xls,.csv'}
+                      label="Sensor Data"
+                      description="Real-time sensor readings and monitoring data"
+                      onFileSelect={handleFileSelect('sensorData')}
+                      selectedFile={formData.sensorData}
                       disabled={!isAuthenticated}
                     />
                   </div>
                   <div onClick={!isAuthenticated ? handleFileUploadClick : undefined}>
                     <Select 
-                      onValueChange={handleFormatChange('environmentalFormat')} 
-                      value={formData.environmentalFormat} 
+                      onValueChange={handleFormatChange('sensorDataFormat')} 
+                      value={formData.sensorDataFormat} 
                       disabled={!isAuthenticated}
                     >
                       <SelectTrigger>
@@ -280,11 +275,11 @@ const Homepage = () => {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                <Camera className="h-8 w-8 text-primary-foreground" />
+                <Activity className="h-8 w-8 text-primary-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Drone Image Analysis</h4>
+              <h4 className="text-xl font-semibold text-foreground">Real-Time Sensor Monitoring</h4>
               <p className="text-muted-foreground">
-                Advanced computer vision processes aerial imagery to identify geological changes and potential risk areas.
+                Continuous sensor data analysis detects anomalies and predicts potential rockfall events in real-time.
               </p>
             </div>
             
@@ -300,11 +295,11 @@ const Homepage = () => {
             
             <div className="text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-success rounded-full flex items-center justify-center">
-                <Leaf className="h-8 w-8 text-success-foreground" />
+                <BarChart3 className="h-8 w-8 text-success-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">Environmental Integration</h4>
+              <h4 className="text-xl font-semibold text-foreground">AI-Powered Risk Assessment</h4>
               <p className="text-muted-foreground">
-                Weather patterns, seismic data, and environmental factors enhance prediction accuracy and safety protocols.
+                Machine learning algorithms analyze patterns and generate comprehensive risk reports with automated alerts.
               </p>
             </div>
           </div>

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { AlertTriangle } from "lucide-react";
+import { Shield } from "lucide-react";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -70,12 +70,15 @@ const Signup = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div 
+          className="text-center mb-8 cursor-pointer hover:opacity-80 transition-opacity" 
+          onClick={() => navigate("/")}
+        >
           <div className="flex items-center justify-center mb-4">
-            <AlertTriangle className="h-12 w-12 text-primary mr-2" />
-            <h1 className="text-3xl font-bold text-foreground">RockAlert</h1>
+            <Shield className="h-12 w-12 text-primary mr-2" />
+            <h1 className="text-3xl font-bold text-foreground">SafeMine AI</h1>
           </div>
-          <p className="text-muted-foreground">AI-Based Rockfall Prediction System</p>
+          <p className="text-muted-foreground">Advanced Geological Analysis & Risk Prevention</p>
         </div>
 
         <Card className="border-border">
