@@ -138,9 +138,9 @@ const Homepage = () => {
                 <Radio className="h-5 w-5" />
                 <span className="text-sm font-medium">Sensor Analysis</span>
               </div>
-              <div className="flex items-center space-x-2 text-warning">
-                <Mountain className="h-5 w-5" />
-                <span className="text-sm font-medium">3D Modeling</span>
+              <div className="flex items-center space-x-2 text-destructive">
+                <Shield className="h-5 w-5" />
+                <span className="text-sm font-medium">Risk Maps with Alerts</span>
               </div>
               <div className="flex items-center space-x-2 text-primary">
                 <BarChart3 className="h-5 w-5" />
@@ -284,12 +284,12 @@ const Homepage = () => {
             </div>
             
             <div className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-warning rounded-full flex items-center justify-center">
-                <Mountain className="h-8 w-8 text-warning-foreground" />
+              <div className="mx-auto w-16 h-16 bg-destructive rounded-full flex items-center justify-center">
+                <Shield className="h-8 w-8 text-destructive-foreground" />
               </div>
-              <h4 className="text-xl font-semibold text-foreground">3D Terrain Modeling</h4>
+              <h4 className="text-xl font-semibold text-foreground">Risk Maps with Alerts</h4>
               <p className="text-muted-foreground">
-                CAD-based elevation models combined with geological data provide precise topographical analysis.
+                Interactive risk visualization with automated email alerts for high-risk zones and safety notifications.
               </p>
             </div>
             
